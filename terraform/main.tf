@@ -6,5 +6,6 @@ provider "aws" {
 module "networking" {
   source = "./networking"
 
-  group = "cloud_siwe_${terraform.workspace}"
+  environment = terraform.workspace
+  group       = "cloud_siwe_${terraform.workspace}"
 }
