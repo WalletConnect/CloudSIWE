@@ -1,0 +1,23 @@
+name: Ensure Formatting
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  terraform-formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Ensure Formatting
+        run: |
+          terraform fmt -check=true
+          if [ $? -ne 0 ]; then
+            echo "Formatting failed, please run 'terraform fmt -check=true'"
+            exit 1
+          fi
+          echo "Formatting passed"
+          exit 0

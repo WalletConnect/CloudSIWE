@@ -1,0 +1,7 @@
+# Editors
+.vscode
+.idea
+
+# Terraform
+.env
+terraform/.terraform
