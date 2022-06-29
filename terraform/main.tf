@@ -5,38 +5,37 @@ provider "aws" {
 
 locals {
   environment = terraform.workspace
-  group       = "cloud-siwe-${terraform.workspace}"
+  group = "cloud-siwe-${local.environment}"
 }
 
-resource "aws_vpc" "cloud_siwe_vpc" {
-  cidr_block = "10.0.0.0/16"
+module "vpc" {
+  source = "terraform-aws-modules/vpc/aws"
+
+  name = "${local.group}-vpc"
+  cidr = "10.0.0.0/16"
+
+  azs             = var.azs
+  private_subnets = ["10.0.1.0/24"]
+  public_subnets  = ["10.0.2.0/24"]
 
   tags = {
-    Name        = "cloud-siwe-${locals.environment}-vpc"
-    Environment = locals.environment # To make filtering easier
-    Group       = locals.group # To make filtering easier
+    Environment = local.environment
+    Group = local.group
   }
-}
 
-resource "aws_subnet" "cloud_siwe_private_subnet" {
-  vpc_id                  = aws_vpc.cloud_siwe_vpc.id
-  cidr_block              = "10.0.1.0/24"
-  map_public_ip_on_launch = false
-
-  tags = {
-    Name        = "cloud-siwe-${locals.environment}-private-subnet"
-    Environment = locals.environment # To make filtering easier
-    Group       = locals.group # To make filtering easier
+  vpc_tags = {
+    Name = "${local.group}-vpc"
   }
-}
 
-resource "aws_subnet" "cloud_siwe_public_subnet" {
-  vpc_id     = aws_vpc.cloud_siwe_vpc.id
-  cidr_block = "10.0.2.0/24"
-  
-  tags = {
-    Name        = "cloud-siwe-${locals.environment}-public-subnet"
-    Environment = locals.environment # To make filtering easier
-    Group       = locals.group # To make filtering easier
+  public_subnet_tags = {
+    Name = "${local.group}-public-subnet"
+  }
+
+  private_subnet_tags = {
+    Name = "${local.group}-public-subnet"
+  }
+
+  igw_tags = {
+    Name = "${local.group}-igw"
   }
 }
