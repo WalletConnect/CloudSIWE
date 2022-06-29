@@ -5,7 +5,7 @@ provider "aws" {
 
 locals {
   environment = terraform.workspace
-  group = "cloud-siwe-${local.environment}"
+  group       = "cloud-siwe-${local.environment}"
 }
 
 module "vpc" {
@@ -20,7 +20,7 @@ module "vpc" {
 
   tags = {
     Environment = local.environment
-    Group = local.group
+    Group       = local.group
   }
 
   vpc_tags = {
