@@ -112,3 +112,6 @@ $RECYCLE.BIN/
 .vscode
 .atom
 .idea
+
+### Secrets ###
+.env

@@ -8,3 +8,6 @@ provider "aws" {
   skip_credentials_validation = true
   skip_requesting_account_id  = true
 }
+
+# Configure the Cloudflare Provider
+provider "cloudflare" {}
