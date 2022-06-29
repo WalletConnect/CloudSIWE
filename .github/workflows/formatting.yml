@@ -12,9 +12,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - uses: hashicorp/setup-terraform@v2
+
       - name: Ensure Formatting
         run: |
-          terraform fmt -check=true
+          terraform fmt -recursive -check
           if [ $? -ne 0 ]; then
             echo "Formatting failed, please run 'terraform fmt -check=true'"
             exit 1
