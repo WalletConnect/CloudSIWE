@@ -18,9 +18,3 @@ jobs:
       - name: Ensure Formatting
         run: |
           terraform fmt -recursive -check
-          if [ $? -ne 0 ]; then
-            echo "Formatting failed, please run 'terraform fmt -check=true'"
-            exit 1
-          fi
-          echo "Formatting passed"
-          exit 0
