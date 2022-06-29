@@ -5,14 +5,14 @@ provider "aws" {
 
 locals {
   environment = terraform.workspace
-  group       = "cloud_siwe_${terraform.workspace}"
+  group       = "cloud-siwe-${terraform.workspace}"
 }
 
 resource "aws_vpc" "cloud_siwe_vpc" {
   cidr_block = "10.0.0.0/16"
 
   tags = {
-    Name        = "cloud_siwe_${locals.environment}_vpc"
+    Name        = "cloud-siwe-${locals.environment}-vpc"
     Environment = locals.environment # To make filtering easier
     Group       = locals.group # To make filtering easier
   }
@@ -24,7 +24,7 @@ resource "aws_subnet" "cloud_siwe_private_subnet" {
   map_public_ip_on_launch = false
 
   tags = {
-    Name        = "cloud_siwe_${locals.environment}_private_subnet"
+    Name        = "cloud-siwe-${locals.environment}-private-subnet"
     Environment = locals.environment # To make filtering easier
     Group       = locals.group # To make filtering easier
   }
@@ -35,7 +35,7 @@ resource "aws_subnet" "cloud_siwe_public_subnet" {
   cidr_block = "10.0.2.0/24"
   
   tags = {
-    Name        = "cloud_siwe_${locals.environment}_public_subnet"
+    Name        = "cloud-siwe-${locals.environment}-public-subnet"
     Environment = locals.environment # To make filtering easier
     Group       = locals.group # To make filtering easier
   }
