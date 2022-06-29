@@ -30,14 +30,14 @@ module "vpc" {
 
   private_subnet_tags = merge(
     {
-      Purpose = "service"
+      Visibility = "private"
     },
     module.base_tags.tags.value
   )
 
   public_subnet_tags = merge(
     {
-      Purpose = "app"
+      Visibility = "public"
     },
     module.base_tags.tags.value
   )
