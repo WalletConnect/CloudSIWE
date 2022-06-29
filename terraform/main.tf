@@ -32,7 +32,7 @@ module "vpc" {
   }
 
   private_subnet_tags = {
-    Name = "${local.group}-public-subnet"
+    Name = "${local.group}-private-subnet"
   }
 
   igw_tags = {
