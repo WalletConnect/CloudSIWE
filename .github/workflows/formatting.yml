@@ -1,0 +1,20 @@
+name: Ensure Formatting
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  terraform-formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - uses: hashicorp/setup-terraform@v2
+
+      - name: Ensure Formatting
+        run: |
+          terraform fmt -recursive -check
