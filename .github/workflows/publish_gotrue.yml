@@ -1,0 +1,111 @@
+name: Publish GoTrue
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        type: string
+        required: true
+        description: "The tag to be applied to the image"
+      branch:
+        type: string
+        required: true
+        default: "master"
+        description: "The repo branch to checkout"
+      private-push:
+        type: boolean
+        required: true
+        default: true
+        description: "Should this be pushed to the private docker repo?"
+      public-push:
+        type: boolean
+        required: true
+        default: false
+        description: "Should this be pushed to the public docker repo?"
+
+env:
+  PRIVATE_REPOSITORY: "898587786287.dkr.ecr.eu-central-1.amazonaws.com/gotrue"
+  PUBLIC_REPOSITORY: "public.ecr.aws/b2r1c3e3/gotrue"
+
+jobs:
+  create-private-image:
+    runs-on: ubuntu-latest
+    if: ${{ inputs.public-push }}
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      # Checkout the WalletConnect/gotrue repository
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          name: WalletConnect/gotrue
+          ref: ${{ inputs.branch }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Build, tag, and push image to Amazon ECR
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: ${{ env.PRIVATE_REPOSITORY }}:${{ inputs.tag }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new
+  create-public-image:
+    runs-on: ubuntu-latest
+    if: ${{ inputs.public-push }}
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-central-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      # Checkout the WalletConnect/gotrue repository
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          name: WalletConnect/gotrue
+          ref: ${{ inputs.branch }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Build, tag, and push image to Amazon ECR
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: ${{ env.PUBLIC_REPOSITORY }}:${{ inputs.tag }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new
