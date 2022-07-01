@@ -113,12 +113,12 @@ resource "aws_ecs_task_definition" "app_task_definition" {
       name      = "gotrue",
       image     = "supabase/gotrue:latest", # TODO switch to custom image!
       essential = true,
-      cpu = 2048,
-      memory = 4096,
+      cpu       = 2048,
+      memory    = 4096,
       portMappings = [
         {
-            containerPort = 8080,
-            hostPort = 8080
+          containerPort = 8080,
+          hostPort      = 8080
         }
       ]
       logConfiguration = {
