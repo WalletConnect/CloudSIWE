@@ -1,18 +1,18 @@
 locals {
-  group = "cloud-siwe-${terraform.workspace}"
+  name = "cloud-siwe-${terraform.workspace}"
 }
 
 module "tags" {
   source = "github.com/WalletConnect/terraform-modules/modules/tags"
 
-  application = local.group
+  application = local.name
   env         = terraform.workspace
 }
 
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
 
-  name = "${local.group}-vpc"
+  name = "${local.name}-vpc"
   cidr = "10.0.0.0/16"
 
   azs             = var.azs
@@ -26,6 +26,15 @@ module "vpc" {
   public_subnet_tags = {
     Visibility = "public"
   }
+
+  enable_dns_support   = true
+  enable_dns_hostnames = true
+}
+
+module "secrets" {
+  source = "./secrets"
+
+  app_name = local.name
 }
 
 # TODO Limit to Prod only
