@@ -27,3 +27,9 @@ module "vpc" {
     Visibility = "public"
   }
 }
+
+# TODO Limit to Prod only
+resource "aws_ecr_repository" "gotrue" {
+  name                 = "gotrue"
+  image_tag_mutability = "MUTABLE"
+}
