@@ -29,22 +29,6 @@ module "vpc" {
 }
 
 # TODO Limit to Prod only
-
-resource "aws_ecrpublic_repository" "gotrue" {
-  provider        = aws.us_east_1 # Only avaliable here
-  repository_name = "gotrue"
-
-  catalog_data {
-    architectures = [
-      "x86",
-    ]
-    operating_systems = [
-      "Linux",
-    ]
-  }
-}
-
-# TODO Limit to Prod only
 resource "aws_ecr_repository" "gotrue" {
   name                 = "gotrue"
   image_tag_mutability = "MUTABLE"
