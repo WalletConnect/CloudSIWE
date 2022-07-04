@@ -29,7 +29,7 @@ env:
 jobs:
   create-private-image:
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.public-push }}
+    if: ${{ github.event.inputs.private-push == true }}
     steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -46,7 +46,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          name: WalletConnect/gotrue
+          repository: WalletConnect/gotrue
           ref: ${{ github.event.inputs.branch }}
 
       - name: Set up Docker Buildx
@@ -70,13 +70,13 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache-new
   create-public-image:
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.public-push }}
+    if: ${{ github.event.inputs.public-push == true }}
     steps:
       # Checkout the WalletConnect/gotrue repository
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          name: WalletConnect/gotrue
+          repository: WalletConnect/gotrue
           ref: ${{ github.event.inputs.branch }}
 
       - name: Log in to Docker Hub
