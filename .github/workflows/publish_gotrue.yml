@@ -29,7 +29,7 @@ env:
 jobs:
   create-private-image:
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.private-push == true }}
+    if: ${{ github.event.inputs.private-push == "true" }}
     steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -70,7 +70,7 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache-new
   create-public-image:
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.public-push == true }}
+    if: ${{ github.event.inputs.public-push == "true" }}
     steps:
       # Checkout the WalletConnect/gotrue repository
       - name: Checkout
