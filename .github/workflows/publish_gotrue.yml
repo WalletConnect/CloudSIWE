@@ -29,7 +29,7 @@ env:
 jobs:
   create-private-image:
     runs-on: ubuntu-latest
-    if: ${{ inputs.public-push }}
+    if: ${{ github.event.inputs.public-push }}
     steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -47,7 +47,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           name: WalletConnect/gotrue
-          ref: ${{ inputs.branch }}
+          ref: ${{ github.event.inputs.branch }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -65,19 +65,19 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.PRIVATE_REPOSITORY }}:${{ inputs.tag }}
+          tags: ${{ env.PRIVATE_REPOSITORY }}:${{ github.event.inputs.tag }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
   create-public-image:
     runs-on: ubuntu-latest
-    if: ${{ inputs.public-push }}
+    if: ${{ github.event.inputs.public-push }}
     steps:
       # Checkout the WalletConnect/gotrue repository
       - name: Checkout
         uses: actions/checkout@v2
         with:
           name: WalletConnect/gotrue
-          ref: ${{ inputs.branch }}
+          ref: ${{ github.event.inputs.branch }}
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
@@ -101,6 +101,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.PUBLIC_REPOSITORY }}:${{ inputs.tag }}
+          tags: ${{ env.PUBLIC_REPOSITORY }}:${{ github.event.inputs.tag }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
