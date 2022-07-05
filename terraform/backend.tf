@@ -9,10 +9,6 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 3.27"
     }
-    cloudflare = {
-      source  = "cloudflare/cloudflare"
-      version = "~> 3.0"
-    }
   }
 
   backend "s3" {

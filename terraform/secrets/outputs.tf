@@ -17,3 +17,7 @@ output "smtp_password_arn" {
 output "catcha_secret_arn" {
   value = aws_secretsmanager_secret.catcha_secret.arn
 }
+
+output "captcha_session_key_arn" {
+  value = aws_secretsmanager_secret.captcha_session_key.arn
+}

@@ -17,3 +17,7 @@ resource "aws_secretsmanager_secret" "smtp_password" {
 resource "aws_secretsmanager_secret" "catcha_secret" {
   name = "${var.app_name}-captcha-secret"
 }
+
+resource "aws_secretsmanager_secret" "captcha_session_key" {
+  name = "${var.app_name}-captcha-session-key"
+}
