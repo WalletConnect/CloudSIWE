@@ -12,8 +12,8 @@ resource "aws_ecs_task_definition" "app_task_definition" {
   execution_role_arn = aws_iam_role.ecsTaskExecutionRole.arn
   container_definitions = jsonencode([
     {
-      name  = "${var.app_name}-gotrue",
-      image = "${var.repository_url}:${var.image_tag}", # TODO switch to custom image!
+      name      = "${var.app_name}-gotrue",
+      image     = "${var.repository_url}:${var.image_tag}", # TODO switch to custom image!
       cpu       = 1920,
       memory    = 3840,
       command   = ["gotrue", "serve"],
@@ -109,7 +109,7 @@ resource "aws_ecs_service" "app_service" {
 
   network_configuration {
     subnets          = data.aws_subnets.private_subnets.ids
-    assign_public_ip = true                                                                               # We do public ingress through the LB
+    assign_public_ip = true                                    # We do public ingress through the LB
     security_groups  = [aws_security_group.vpc_app_ingress.id] # Setting the security group
   }
 

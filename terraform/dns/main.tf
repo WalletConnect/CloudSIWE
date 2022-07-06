@@ -24,7 +24,7 @@ resource "aws_route53_record" "cert_verification" {
 
   zone_id = aws_route53_zone.login_zone.zone_id
   name    = local.verification_records[count.index].resource_record_name
-  type   = local.verification_records[count.index].resource_record_type
+  type    = local.verification_records[count.index].resource_record_type
   records = [local.verification_records[count.index].resource_record_value]
   ttl     = 300
 }

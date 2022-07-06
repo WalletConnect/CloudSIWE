@@ -40,7 +40,7 @@ variable "subdomain" {
 }
 
 variable "fqdn" {
-  type     = string
+  type = string
 }
 
 variable "route53_zone_id" {

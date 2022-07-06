@@ -11,6 +11,6 @@ variable "fqdn" {
 }
 
 variable "fqdn_subdomain" {
-  type = string
+  type     = string
   nullable = true
 }

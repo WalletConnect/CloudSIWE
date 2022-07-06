@@ -62,11 +62,11 @@ module "ecs" {
   env_bucket_arn = aws_s3_bucket.cloudsiwe_env.arn
   env_file_name  = "gotrue.env"
 
-  jwt_secret_arn         = module.secrets.jwt_secret_arn
-  database_url_arn       = module.secrets.database_url_arn
-  smtp_username_arn      = module.secrets.smtp_username_arn
-  smtp_password_arn      = module.secrets.smtp_password_arn
-  catcha_secret_arn      = module.secrets.catcha_secret_arn
+  jwt_secret_arn          = module.secrets.jwt_secret_arn
+  database_url_arn        = module.secrets.database_url_arn
+  smtp_username_arn       = module.secrets.smtp_username_arn
+  smtp_password_arn       = module.secrets.smtp_password_arn
+  catcha_secret_arn       = module.secrets.catcha_secret_arn
   captcha_session_key_arn = module.secrets.captcha_session_key_arn
 
   repository_url = aws_ecr_repository.gotrue.repository_url
