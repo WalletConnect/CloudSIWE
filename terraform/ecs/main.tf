@@ -54,44 +54,6 @@ data "aws_subnets" "public_subnets" {
 }
 
 # Security Groups
-resource "aws_security_group" "internal_otel" {
-  name        = "${var.app_name}-internal-otel"
-  description = "Allow access to otel internally and otel to access anywhere externally"
-  vpc_id      = data.aws_vpc.vpc.id
-  ingress {
-    from_port   = 4317 # Allowing traffic in from port 4317-4318
-    to_port     = 4318
-    protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.vpc.cidr_block] # Allowing traffic in from all sources
-  }
-
-  egress {
-    from_port   = 0             # Allowing any incoming port
-    to_port     = 0             # Allowing any outgoing port
-    protocol    = "-1"          # Allowing any outgoing protocol
-    cidr_blocks = ["0.0.0.0/0"] # Allowing traffic out to all IP addresses
-  }
-}
-
-resource "aws_security_group" "tls_ingess" {
-  name        = "${var.app_name}-tls-ingress"
-  description = "Allow tls ingress from everywhere"
-  vpc_id      = data.aws_vpc.vpc.id
-  ingress {
-    from_port   = 443 # Allowing traffic in from port 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # Allowing traffic in from all sources
-  }
-
-  egress {
-    from_port   = 0             # Allowing any incoming port
-    to_port     = 0             # Allowing any outgoing port
-    protocol    = "-1"          # Allowing any outgoing protocol
-    cidr_blocks = ["0.0.0.0/0"] # Allowing traffic out to all IP addresses
-  }
-}
-
 resource "aws_security_group" "vpc_app_ingress" {
   name        = "${var.app_name}-vpc-ingress-to-app"
   description = "Allow app port ingress from vpc"
@@ -109,5 +71,40 @@ resource "aws_security_group" "vpc_app_ingress" {
     to_port     = 0             # Allowing any outgoing port
     protocol    = "-1"          # Allowing any outgoing protocol
     cidr_blocks = ["0.0.0.0/0"] # Allowing traffic out to all IP addresses
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_security_group" "lb_ingress" {
+  name        = "${var.app_name}-lb-ingress"
+  description = "Allow app port ingress from vpc"
+  vpc_id      = data.aws_vpc.vpc.id
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # Allowing traffic in from all sources
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # Allowing traffic in from all sources
+  }
+
+  egress {
+    from_port   = 0                             # Allowing any incoming port
+    to_port     = 0                             # Allowing any outgoing port
+    protocol    = "-1"                          # Allowing any outgoing protocol
+    cidr_blocks = [data.aws_vpc.vpc.cidr_block] # Allowing traffic out to all IP addresses
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
