@@ -60,7 +60,7 @@ module "ecs" {
   fqdn                = var.fqdn
 
   env_bucket_arn = aws_s3_bucket.cloudsiwe_env.arn
-  env_file_name  = "gotrue.env"
+  env_file_name  = "gotrue-${terraform.workspace}.env"
 
   jwt_secret_arn          = module.secrets.jwt_secret_arn
   database_url_arn        = module.secrets.database_url_arn

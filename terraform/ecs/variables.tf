@@ -84,3 +84,11 @@ variable "catcha_secret_arn" {
 variable "captcha_session_key_arn" {
   type = string
 }
+
+variable "cpu" {
+  type = number
+}
+
+variable "memory" {
+  type = number
+}

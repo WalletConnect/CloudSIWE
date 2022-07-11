@@ -63,7 +63,7 @@ resource "aws_security_group" "vpc_app_ingress" {
     from_port   = 8080
     to_port     = 8080
     protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.vpc.cidr_block] # Allowing traffic in from all sources
+    cidr_blocks = [data.aws_vpc.vpc.cidr_block] # Allowing traffic in from VPC
   }
 
   egress {
@@ -101,7 +101,7 @@ resource "aws_security_group" "lb_ingress" {
     from_port   = 0                             # Allowing any incoming port
     to_port     = 0                             # Allowing any outgoing port
     protocol    = "-1"                          # Allowing any outgoing protocol
-    cidr_blocks = [data.aws_vpc.vpc.cidr_block] # Allowing traffic out to all IP addresses
+    cidr_blocks = [data.aws_vpc.vpc.cidr_block] # Allowing traffic out to all VPC IP addresses
   }
 
   lifecycle {

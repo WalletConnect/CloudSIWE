@@ -3,8 +3,8 @@
 ## Task Definition
 resource "aws_ecs_task_definition" "app_task_definition" {
   family = "${var.app_name}-gotrue"
-  cpu    = 2048
-  memory = 4096
+  cpu    = var.cpu
+  memory = var.memory
   requires_compatibilities = [
     "FARGATE"
   ]
@@ -14,8 +14,8 @@ resource "aws_ecs_task_definition" "app_task_definition" {
     {
       name      = "${var.app_name}-gotrue",
       image     = "${var.repository_url}:${var.image_tag}", # TODO switch to custom image!
-      cpu       = 1920,
-      memory    = 3840,
+      cpu       = var.cpu - 128,
+      memory    = var.cpu - 256,
       command   = ["gotrue", "serve"],
       essential = true,
       portMappings = [
