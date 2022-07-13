@@ -71,6 +71,9 @@ module "ecs" {
 
   repository_url = aws_ecr_repository.gotrue.repository_url
   image_tag      = "0.1.5"
+
+  cpu    = var.cpu
+  memory = var.memory
 }
 
 # TODO Limit to Prod only

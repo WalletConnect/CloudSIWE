@@ -1,5 +1,5 @@
 output "certificate_arn" {
-  value = aws_acm_certificate.cert.arn
+  value = aws_acm_certificate.domain_certificate.arn
 }
 
 output "zone_arn" {
