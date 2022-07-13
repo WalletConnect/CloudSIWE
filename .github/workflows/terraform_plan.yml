@@ -23,7 +23,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-central-1
-          environment: dev
+          environment: staging
           app-name: ${{ github.event.repository.name }}
       - uses: actions/upload-artifact@v3
         with:
@@ -40,7 +40,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `<details><summary>Show Plan</summary>
+            const output = `<details><summary>Show Staging Plan</summary>
             \`\`\`\n
             ${process.env.PLAN}
             \`\`\`
