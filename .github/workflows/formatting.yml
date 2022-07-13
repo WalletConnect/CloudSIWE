@@ -2,9 +2,13 @@ name: Ensure Formatting
 
 on:
   pull_request:
+    paths:
+      - 'terraform/**'
   push:
     branches:
       - main
+    paths:
+      - 'terraform/**'
 
 jobs:
   terraform-formatting:

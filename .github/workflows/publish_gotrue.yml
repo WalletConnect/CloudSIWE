@@ -12,15 +12,21 @@ on:
         default: "master"
         description: "The repo branch to checkout"
       private-push:
-        type: boolean
+        type: choice
         required: true
-        default: true
+        default: 'yes'
         description: "Should this be pushed to the private docker repo?"
+        options:
+        - 'yes'
+        - 'no'
       public-push:
-        type: boolean
+        type: choice
         required: true
-        default: false
+        default: 'yes'
         description: "Should this be pushed to the public docker repo?"
+        options:
+        - 'yes'
+        - 'no'
 
 env:
   PRIVATE_REPOSITORY: "898587786287.dkr.ecr.eu-central-1.amazonaws.com/gotrue"
@@ -29,7 +35,7 @@ env:
 jobs:
   create-private-image:
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.private-push }}
+    if: ${{ github.event.inputs.private-push == 'yes' }}
     steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -70,7 +76,7 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache-new
   create-public-image:
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.public-push }}
+    if: ${{ github.event.inputs.public-push == 'yes' }}
     steps:
       # Checkout the WalletConnect/gotrue repository
       - name: Checkout

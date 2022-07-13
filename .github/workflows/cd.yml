@@ -1,33 +1,55 @@
 name: CD
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'terraform/**'
 
 concurrency: ${{ github.workflow }}
 
 jobs:
-  deploy-infra:
-    # If CD was triggered by a CI run
-    # ensure that the CI run was actually successful
-    if: ${{ github.event.type != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
-    strategy:
-      fail-fast: true
-      matrix:
-        env: [dev] # TODO add prod here
-
+  deploy-staging-infra:
     runs-on: ubuntu-latest
     environment:
-      name: infra/${{ matrix.env }}
-      url: ${{ matrix.env == 'prod' && 'https://login.walletconnect.com/health' || format('https://{0}.login.walletconnect.com/health', matrix.env) }}
+      name: infra/staging
+      url: https://staging.login.walletconnect.com/health
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
       - uses: hashicorp/setup-terraform@v2
 
-      - id: deploy-${{ matrix.env }}
+      - id: deploy-staging
         uses: WalletConnect/actions/actions/deploy-terraform/@master
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-central-1
-          environment: ${{ matrix.env }}
+          environment: staging
+
+  test-staging-infra:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Staging Up
+        runs: curl --fail --connect-timeout 15 --retry 5 --retry-delay 5 https://staging.login.walletconnect.com/health
+
+  deploy-prod-infra:
+    runs-on: ubuntu-latest
+    environment:
+      name: infra/prod
+      url: https://login.walletconnect.com/health
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - uses: hashicorp/setup-terraform@v2
+
+      - id: deploy-prod
+        uses: WalletConnect/actions/actions/deploy-terraform/@master
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1
+          environment: prod
