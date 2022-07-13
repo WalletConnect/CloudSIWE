@@ -33,17 +33,10 @@ jobs:
         with:
           name: plan.txt
           path: ${{ steps.plan.outputs.output-file }}
-      - name: Get Plan
-        id: get-plan
-        env:
-          PLAN_FILE: ${{ steps.plan.outputs.output-file }}
-        run: |
-          PLAN=$(cat $PLAN_FILE)
-          echo "::set-output name=plan::$PLAN"
       - name: Add Plan to PR
         uses: actions/github-script@v6
         env:
-          PLAN: "${{ steps.get-plan.outputs.plan }}"
+          PLAN: "terraform\n${{ steps.plan.outputs.plan }}"
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
