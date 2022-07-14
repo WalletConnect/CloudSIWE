@@ -157,7 +157,7 @@ resource "aws_lb_target_group" "target_group" {
   protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = var.vpc_id # Referencing the default VPC
-  slow_start  = 30                  # Give a 30 seccond delay to allow the service to startup
+  slow_start  = 30         # Give a 30 seccond delay to allow the service to startup
   health_check {
     protocol            = "HTTP"
     path                = "/health"
@@ -317,9 +317,9 @@ resource "aws_security_group" "lb_ingress" {
   }
 
   egress {
-    from_port   = 0                             # Allowing any incoming port
-    to_port     = 0                             # Allowing any outgoing port
-    protocol    = "-1"                          # Allowing any outgoing protocol
+    from_port   = 0              # Allowing any incoming port
+    to_port     = 0              # Allowing any outgoing port
+    protocol    = "-1"           # Allowing any outgoing protocol
     cidr_blocks = [var.vpc_cidr] # Allowing traffic out to all VPC IP addresses
   }
 
