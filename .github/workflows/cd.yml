@@ -1,4 +1,5 @@
-name: CD
+name: Deployment
+
 on:
   workflow_dispatch:
   push:
@@ -33,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check Staging Up
-        runs: curl --fail --connect-timeout 15 --retry 5 --retry-delay 5 https://staging.login.walletconnect.com/health
+        run: curl --fail --connect-timeout 15 --retry 5 --retry-delay 5 https://staging.login.walletconnect.com/health
 
   deploy-prod-infra:
     runs-on: ubuntu-latest
