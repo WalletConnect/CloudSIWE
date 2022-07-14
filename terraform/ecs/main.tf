@@ -199,10 +199,14 @@ resource "aws_lb_listener" "listener-http" {
 # DNS Records
 resource "aws_route53_record" "dns_load_balancer" {
   zone_id = var.route53_zone_id
-  name    = var.subdomain != null ? var.subdomain : "@"
-  type    = "CNAME"
-  records = [aws_lb.application_load_balancer.dns_name]
-  ttl     = 300
+  name    = var.subdomain != null ? var.subdomain : var.fqdn
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.application_load_balancer.dns_name
+    zone_id                = aws_lb.application_load_balancer.zone_id
+    evaluate_target_health = true
+  }
 }
 
 # IAM

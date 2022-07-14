@@ -13,6 +13,7 @@ variable "fqdn" {
 variable "fqdn_subdomain" {
   type     = string
   nullable = true
+  default  = null
 }
 
 variable "cpu" {

@@ -43,7 +43,8 @@ module "secrets" {
 module "login_domain" {
   source = "./dns"
 
-  zone_domain = var.fqdn
+  zone_domain    = var.fqdn
+  cert_subdomain = var.fqdn_subdomain
 }
 
 module "ecs" {
@@ -76,9 +77,9 @@ module "ecs" {
   cpu    = var.cpu
   memory = var.memory
 
-  vpc_id = module.vpc.vpc_id
-  vpc_cidr = module.vpc.vpc_cidr_block
-  public_subnets = module.vpc.public_subnets
+  vpc_id          = module.vpc.vpc_id
+  vpc_cidr        = module.vpc.vpc_cidr_block
+  public_subnets  = module.vpc.public_subnets
   private_subnets = module.vpc.private_subnets
 }
 
