@@ -85,9 +85,9 @@ module "env_bucket" {
   source = "github.com/WalletConnect/terraform-modules/modules/s3"
 
   application = local.app_name
-  env = terraform.workspace
-  env_group = terraform.workspace
-  tags = module.tags.tags
-  acl = "private"
-  versioning = false
+  env         = terraform.workspace
+  env_group   = terraform.workspace
+  tags        = module.tags.tags
+  acl         = "private"
+  versioning  = false
 }
