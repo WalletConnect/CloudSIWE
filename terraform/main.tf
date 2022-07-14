@@ -60,8 +60,8 @@ module "ecs" {
   subdomain           = var.fqdn_subdomain
   fqdn                = var.fqdn
 
-  env_bucket_arn = data.aws_s3_bucket.env.arn
-  env_file_name  = "gotrue-${terraform.workspace}.env"
+  env_bucket_arn = module.env_bucket.arn
+  env_file_name  = "gotrue.env"
 
   jwt_secret_arn          = module.secrets.jwt_secret_arn
   database_url_arn        = module.secrets.database_url_arn
@@ -81,6 +81,13 @@ data "aws_ecr_repository" "gotrue" {
   name = "gotrue"
 }
 
-data "aws_s3_bucket" "env" {
-  bucket = "${local.app_name}-env"
+module "env_bucket" {
+  source = "github.com/WalletConnect/terraform-modules/modules/s3"
+
+  application = local.app_name
+  env = terraform.workspace
+  env_group = terraform.workspace
+  tags = module.tags.tags
+  acl = "private"
+  versioning = false
 }
