@@ -15,4 +15,3 @@ Use the dev workspace:
 Now you can apply the changes:
 
 `terraform -chdir=terraform apply  -var-file="vars/dev.tfvars"`
-
