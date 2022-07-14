@@ -20,39 +20,6 @@ resource "aws_ecs_cluster" "app_cluster" {
   }
 }
 
-## VPC Reference
-data "aws_vpc" "vpc" {
-  filter {
-    name   = "tag:Name"
-    values = [var.vpc_name]
-  }
-}
-
-## Providing a reference to our default subnets
-data "aws_subnets" "private_subnets" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.vpc.id]
-  }
-
-  filter {
-    name   = "tag:Visibility"
-    values = ["private"]
-  }
-}
-
-data "aws_subnets" "public_subnets" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.vpc.id]
-  }
-
-  filter {
-    name   = "tag:Visibility"
-    values = ["public"]
-  }
-}
-
 # GoTrue
 
 ## Task Definition
@@ -163,7 +130,7 @@ resource "aws_ecs_service" "app_service" {
   }
 
   network_configuration {
-    subnets          = data.aws_subnets.private_subnets.ids
+    subnets          = var.private_subnets
     assign_public_ip = true                                    # We do public ingress through the LB
     security_groups  = [aws_security_group.vpc_app_ingress.id] # Setting the security group
   }
@@ -179,7 +146,7 @@ resource "aws_ecs_service" "app_service" {
 resource "aws_lb" "application_load_balancer" {
   name               = "${var.app_name}-load-balancer"
   load_balancer_type = "application"
-  subnets            = data.aws_subnets.public_subnets.ids
+  subnets            = var.public_subnets
 
   security_groups = [aws_security_group.lb_ingress.id]
 }
@@ -189,7 +156,7 @@ resource "aws_lb_target_group" "target_group" {
   port        = 80
   protocol    = "HTTP"
   target_type = "ip"
-  vpc_id      = data.aws_vpc.vpc.id # Referencing the default VPC
+  vpc_id      = var.vpc_id # Referencing the default VPC
   slow_start  = 30                  # Give a 30 seccond delay to allow the service to startup
   health_check {
     protocol            = "HTTP"
@@ -305,7 +272,7 @@ resource "aws_iam_role_policy_attachment" "ecsTaskExecutionRole_policy" {
 resource "aws_security_group" "vpc_app_ingress" {
   name        = "${var.app_name}-vpc-ingress-to-app"
   description = "Allow app port ingress from vpc"
-  vpc_id      = data.aws_vpc.vpc.id
+  vpc_id      = var.vpc_id
 
   ingress {
     from_port       = 8080
@@ -329,7 +296,7 @@ resource "aws_security_group" "vpc_app_ingress" {
 resource "aws_security_group" "lb_ingress" {
   name        = "${var.app_name}-lb-ingress"
   description = "Allow app port ingress from vpc"
-  vpc_id      = data.aws_vpc.vpc.id
+  vpc_id      = var.vpc_id
 
   ingress {
     from_port   = 443
@@ -349,7 +316,7 @@ resource "aws_security_group" "lb_ingress" {
     from_port   = 0                             # Allowing any incoming port
     to_port     = 0                             # Allowing any outgoing port
     protocol    = "-1"                          # Allowing any outgoing protocol
-    cidr_blocks = [data.aws_vpc.vpc.cidr_block] # Allowing traffic out to all VPC IP addresses
+    cidr_blocks = [var.vpc_cidr] # Allowing traffic out to all VPC IP addresses
   }
 
   lifecycle {
