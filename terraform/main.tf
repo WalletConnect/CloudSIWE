@@ -71,7 +71,7 @@ module "ecs" {
   captcha_session_key_arn = module.secrets.captcha_session_key_arn
 
   repository_url = data.aws_ecr_repository.gotrue.repository_url
-  image_tag      = "0.1.5"
+  image_tag      = "0.1.6"
 
   cpu    = var.cpu
   memory = var.memory
