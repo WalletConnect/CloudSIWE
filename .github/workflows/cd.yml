@@ -31,12 +31,14 @@ jobs:
           environment: staging
 
   test-staging-infra:
+    needs: [deploy-staging-infra]
     runs-on: ubuntu-latest
     steps:
       - name: Check Staging Up
         run: curl --fail --connect-timeout 15 --retry 5 --retry-delay 5 https://staging.login.walletconnect.com/health
 
   deploy-prod-infra:
+    needs: [test-staging-infra]
     runs-on: ubuntu-latest
     environment:
       name: infra/prod
