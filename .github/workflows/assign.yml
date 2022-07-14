@@ -1,7 +1,7 @@
 # Automatically assigns new issues
 # to the Cloud Team project
 # https://github.com/orgs/WalletConnect/projects/9
-name: assign
+name: Assign
 
 on:
   issues:
@@ -18,4 +18,3 @@ jobs:
         with:
           project-url: https://github.com/orgs/WalletConnect/projects/9
           github-token: ${{ secrets.ASSIGN_TO_PROJECT_GITHUB_TOKEN }}
-
