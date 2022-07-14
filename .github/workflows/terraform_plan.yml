@@ -17,7 +17,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - id: plan
+      - name: Run Terraform Plan
+        id: plan
         uses: WalletConnect/actions/actions/plan-terraform/@master
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -40,12 +41,12 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `<details><summary>Show Staging Plan</summary>
+            const output = `<details><summary>Show Plan</summary>
             \`\`\`\n
             ${process.env.PLAN}
             \`\`\`
             </details>
-            *Pushed by: \`${{ github.actor }}\`, Action: \`${{ github.event_name }}\`*`;
+            *Action: \`${{ github.event_name }}\`*`;
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
