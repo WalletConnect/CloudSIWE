@@ -1,6 +1,6 @@
 locals {
   app_name = "cloud-siwe"
-  name = "${local.app_name}-${terraform.workspace}"
+  name     = "${local.app_name}-${terraform.workspace}"
 }
 
 module "tags" {
@@ -60,7 +60,7 @@ module "ecs" {
   subdomain           = var.fqdn_subdomain
   fqdn                = var.fqdn
 
-  env_bucket_arn = data.aws_s3_bucket.cloudsiwe_env.arn
+  env_bucket_arn = data.aws_s3_bucket.env.arn
   env_file_name  = "gotrue-${terraform.workspace}.env"
 
   jwt_secret_arn          = module.secrets.jwt_secret_arn
@@ -82,5 +82,5 @@ data "aws_ecr_repository" "gotrue" {
 }
 
 data "aws_s3_bucket" "env" {
-  name = "${local.app_name}-env"
+  bucket = "${local.app_name}-env"
 }
