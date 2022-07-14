@@ -1,5 +1,6 @@
 locals {
-  name = "cloud-siwe-${terraform.workspace}"
+  app_name = "cloud-siwe"
+  name     = "${local.app_name}-${terraform.workspace}"
 }
 
 module "tags" {
@@ -59,8 +60,8 @@ module "ecs" {
   subdomain           = var.fqdn_subdomain
   fqdn                = var.fqdn
 
-  env_bucket_arn = aws_s3_bucket.cloudsiwe_env.arn
-  env_file_name  = "gotrue-${terraform.workspace}.env"
+  env_bucket_arn = module.env_bucket.arn
+  env_file_name  = "gotrue.env"
 
   jwt_secret_arn          = module.secrets.jwt_secret_arn
   database_url_arn        = module.secrets.database_url_arn
@@ -69,24 +70,24 @@ module "ecs" {
   catcha_secret_arn       = module.secrets.catcha_secret_arn
   captcha_session_key_arn = module.secrets.captcha_session_key_arn
 
-  repository_url = aws_ecr_repository.gotrue.repository_url
+  repository_url = data.aws_ecr_repository.gotrue.repository_url
   image_tag      = "0.1.5"
 
   cpu    = var.cpu
   memory = var.memory
 }
 
-# TODO Limit to Prod only
-resource "aws_ecr_repository" "gotrue" {
-  name                 = "gotrue"
-  image_tag_mutability = "MUTABLE"
+data "aws_ecr_repository" "gotrue" {
+  name = "gotrue"
 }
 
-resource "aws_s3_bucket" "cloudsiwe_env" {
-  bucket = "cloud-siwe-env"
-}
+module "env_bucket" {
+  source = "github.com/WalletConnect/terraform-modules/modules/s3"
 
-resource "aws_s3_bucket_acl" "cloudsiwe_env_acl" {
-  bucket = aws_s3_bucket.cloudsiwe_env.id
-  acl    = "private"
+  application = local.app_name
+  env         = terraform.workspace
+  env_group   = terraform.workspace
+  tags        = module.tags.tags
+  acl         = "private"
+  versioning  = false
 }
