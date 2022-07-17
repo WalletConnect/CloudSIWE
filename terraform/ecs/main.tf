@@ -276,6 +276,7 @@ resource "aws_security_group" "lb_ingress" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
+    # TODO tighten!
     cidr_blocks = ["0.0.0.0/0"] # Allowing traffic in from all sources
   }
 
