@@ -57,7 +57,6 @@ module "ecs" {
   region = var.region
 
   acm_certificate_arn = module.login_domain.certificate_arn
-  route53_zone_id     = module.login_domain.zone_id
   subdomain           = var.fqdn_subdomain
   fqdn                = var.fqdn
 
@@ -81,6 +80,21 @@ module "ecs" {
   vpc_cidr        = module.vpc.vpc_cidr_block
   public_subnets  = module.vpc.public_subnets
   private_subnets = module.vpc.private_subnets
+}
+
+module "api_gateway" {
+  source = "./gateway"
+
+  app_name = local.name
+
+  supabase_url = var.supabase_url
+  loadbalancer_url = module.ecs.loadbalancer_url
+
+  route53_zone_id     = module.login_domain.zone_id
+  subdomain           = var.fqdn_subdomain
+  fqdn                = var.fqdn
+
+  acm_certificate_arn = module.login_domain.certificate_arn
 }
 
 data "aws_ecr_repository" "gotrue" {

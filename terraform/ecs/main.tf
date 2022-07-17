@@ -168,44 +168,14 @@ resource "aws_lb_target_group" "target_group" {
   }
 }
 
-resource "aws_lb_listener" "listener" {
-  load_balancer_arn = aws_lb.application_load_balancer.arn # Referencing our load balancer
-  port              = "443"
-  protocol          = "HTTPS"
-  certificate_arn   = var.acm_certificate_arn
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.target_group.arn # Referencing our target group
-  }
-}
-
 resource "aws_lb_listener" "listener-http" {
   load_balancer_arn = aws_lb.application_load_balancer.arn
   port              = "80"
   protocol          = "HTTP"
 
   default_action {
-    type = "redirect"
-
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
-  }
-}
-
-# DNS Records
-resource "aws_route53_record" "dns_load_balancer" {
-  zone_id = var.route53_zone_id
-  name    = var.subdomain != null ? var.subdomain : var.fqdn
-  type    = "A"
-
-  alias {
-    name                   = aws_lb.application_load_balancer.dns_name
-    zone_id                = aws_lb.application_load_balancer.zone_id
-    evaluate_target_health = true
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.target_group.arn # Referencing our target group
   }
 }
 
@@ -301,13 +271,6 @@ resource "aws_security_group" "lb_ingress" {
   name        = "${var.app_name}-lb-ingress"
   description = "Allow app port ingress from vpc"
   vpc_id      = var.vpc_id
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # Allowing traffic in from all sources
-  }
 
   ingress {
     from_port   = 80

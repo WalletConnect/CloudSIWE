@@ -2,9 +2,6 @@
 terraform {
   required_version = "~> 1.0"
   required_providers {
-    assert = {
-      source = "bwoznicki/assert"
-    }
     aws = {
       source  = "hashicorp/aws"
       version = "~> 3.27"

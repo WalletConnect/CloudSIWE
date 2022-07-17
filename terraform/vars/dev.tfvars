@@ -5,3 +5,5 @@ fqdn_subdomain = "dev"
 
 cpu    = 512
 memory = 1024
+
+supabase_url = "https://cgzcfirzihqiqjiauasg.supabase.co"
