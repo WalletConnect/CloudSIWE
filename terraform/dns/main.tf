@@ -1,32 +1,34 @@
-data "aws_route53_zone" "hosted_zone" {
-  name = var.zone_domain
-}
+# data "aws_route53_zone" "hosted_zone" {
+#   name = var.zone_domain
+# }
 
-resource "aws_acm_certificate" "domain_certificate" {
-  domain_name       = var.cert_subdomain != null ? "${var.cert_subdomain}.${var.zone_domain}" : var.zone_domain
-  validation_method = "DNS"
+# resource "aws_acm_certificate" "domain_certificate" {
+#   domain_name       = var.cert_subdomain != null ? "${var.cert_subdomain}.${var.zone_domain}" : var.zone_domain
+#   validation_method = "DNS"
 
-  lifecycle {
-    create_before_destroy = true
-  }
-}
+#   #provider = aws.usw-us # Put cert in us-east-1 as that is what is usually required!
 
-locals {
-  verification_records = [for record in aws_acm_certificate.domain_certificate.domain_validation_options : record]
-}
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+# }
 
-resource "aws_route53_record" "cert_verification" {
-  count = length(local.verification_records)
+# locals {
+#   verification_records = [for record in aws_acm_certificate.domain_certificate.domain_validation_options : record]
+# }
 
-  depends_on = [
-    aws_acm_certificate.domain_certificate,
-  ]
+# resource "aws_route53_record" "cert_verification" {
+#   count = length(local.verification_records)
 
-  zone_id = data.aws_route53_zone.hosted_zone.zone_id
-  name    = local.verification_records[count.index].resource_record_name
-  type    = local.verification_records[count.index].resource_record_type
-  records = [local.verification_records[count.index].resource_record_value]
-  ttl     = 300
+#   depends_on = [
+#     aws_acm_certificate.domain_certificate,
+#   ]
 
-  allow_overwrite = true # Removes error when record already exists
-}
+#   zone_id = data.aws_route53_zone.hosted_zone.zone_id
+#   name    = local.verification_records[count.index].resource_record_name
+#   type    = local.verification_records[count.index].resource_record_type
+#   records = [local.verification_records[count.index].resource_record_value]
+#   ttl     = 300
+
+#   allow_overwrite = true # Removes error when record already exists
+# }

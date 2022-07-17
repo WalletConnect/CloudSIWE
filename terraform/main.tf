@@ -87,13 +87,14 @@ module "api_gateway" {
 
   app_name = local.name
 
-  supabase_url = var.supabase_url
+  supabase_url     = var.supabase_url
   loadbalancer_url = module.ecs.loadbalancer_url
 
-  route53_zone_id     = module.login_domain.zone_id
-  subdomain           = var.fqdn_subdomain
-  fqdn                = var.fqdn
+  route53_zone_id = module.login_domain.zone_id
+  subdomain       = var.fqdn_subdomain
+  fqdn            = var.fqdn
 
+  # TODO make dynamic
   acm_certificate_arn = module.login_domain.certificate_arn
 }
 
