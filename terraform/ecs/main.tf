@@ -145,7 +145,7 @@ resource "aws_ecs_service" "app_service" {
 
   network_configuration {
     subnets          = var.private_subnets
-    assign_public_ip = false                                    # We do public ingress through the LB
+    assign_public_ip = true                                    # We do public ingress through the LB
     security_groups  = [aws_security_group.vpc_app_ingress.id] # Setting the security group
   }
 
