@@ -36,16 +36,10 @@ resource "aws_ecs_task_definition" "app_task_definition" {
     {
       name      = "${var.app_name}-gotrue",
       image     = "${var.repository_url}:${var.image_tag}", # TODO switch to custom image!
-      cpu       = var.cpu - 128,
-      memory    = var.cpu - 256,
+      cpu       = var.cpu - 128 - 128, # Take each sidecar container off total so rest is assigned to GoTrue
+      memory    = var.cpu - 256 - 128, # Take each sidecar container off total so rest is assigned to GoTrue
       command   = ["gotrue", "serve"],
       essential = true,
-      portMappings = [
-        {
-          containerPort = 8080,
-          hostPort      = 8080
-        }
-      ],
       secrets = [
         {
           name      = "DATABASE_URL",
@@ -98,6 +92,26 @@ resource "aws_ecs_task_definition" "app_task_definition" {
       }
     },
     {
+      name = "nginx-proxy",
+      image = "nginx:latest",
+      cpu       = 128,
+      memory    = 128,
+      portMappings = [
+        {
+          containerPort = 80,
+          hostPort      = 80
+        }
+      ],
+      logConfiguration = {
+        logDriver = "awslogs",
+        options = {
+          awslogs-group         = "${aws_cloudwatch_log_group.cluster_logs.name}",
+          awslogs-region        = "${var.region}",
+          awslogs-stream-prefix = "ecs"
+        }
+      }
+    },
+    {
       name      = "aws-otel-collector",
       image     = "public.ecr.aws/aws-observability/aws-otel-collector:latest",
       command   = ["--config=/etc/ecs/container-insights/otel-task-metrics-config.yaml"],
@@ -131,14 +145,14 @@ resource "aws_ecs_service" "app_service" {
 
   network_configuration {
     subnets          = var.private_subnets
-    assign_public_ip = true                                    # We do public ingress through the LB
+    assign_public_ip = false                                    # We do public ingress through the LB
     security_groups  = [aws_security_group.vpc_app_ingress.id] # Setting the security group
   }
 
   load_balancer {
     target_group_arn = aws_lb_target_group.target_group.arn # Referencing our target group
-    container_name   = aws_ecs_task_definition.app_task_definition.family
-    container_port   = 8080 # Specifying the container port
+    container_name   = "nginx-proxy"
+    container_port   = 80 # Specifying the container port
   }
 }
 
@@ -207,6 +221,8 @@ resource "aws_route53_record" "dns_load_balancer" {
     zone_id                = aws_lb.application_load_balancer.zone_id
     evaluate_target_health = true
   }
+
+  allow_overwrite = true # Removes error when record already exists
 }
 
 # IAM
