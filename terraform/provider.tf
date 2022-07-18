@@ -10,7 +10,7 @@ provider "aws" {
 }
 
 provider "aws" {
-  alias  = "usw-us"
+  alias  = "us-east-1"
   region = "us-east-1"
 
   skip_get_ec2_platforms      = true

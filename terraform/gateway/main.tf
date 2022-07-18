@@ -68,7 +68,7 @@ resource "aws_api_gateway_integration" "gotrue" {
   resource_id = aws_api_gateway_resource.gotrue_resource.id
   http_method = aws_api_gateway_method.gotrue_method.http_method
 
-  type                    = "HTTP_PROXY"
+  type                    = "AWS"
   integration_http_method = "ANY"
   uri                     = "http://${var.loadbalancer_url}/{proxy}"
 }
