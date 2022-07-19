@@ -1,0 +1,39 @@
+events {
+  worker_connections  4096;  ## Default: 1024
+}
+
+http {
+  include    conf/mime.types;
+  include    /etc/nginx/proxy.conf;
+  include    /etc/nginx/fastcgi.conf;
+
+  server {
+    listen          80;
+    server_name     ${DOMAIN};
+    access_log      logs/${DOMAIN}.log main;
+
+    # TODO evaluate security and look at example kong file in supabase repo
+    location /auth/v1 {
+      proxy_pass      http://${GOTRUE_CONTAINER_IP}:${GOTRUE_CONTAINER_PORT};
+
+      # TODO Cors because GoTrue dosen't add them
+    }
+
+    location /rest/v1 {
+      proxy_pass      https://${SUPABASE_URL}/rest/v1;
+    }
+
+    # TODO check nginx settings for websockets
+    location /realtime/v1 {
+      proxy_pass      https://${SUPABASE_URL}/realtime/v1;
+    }
+
+    location /storage/v1 {
+      proxy_pass      https://${SUPABASE_URL}/storage/v1;
+    }
+
+    location /pg {
+      proxy_pass      https://${SUPABASE_URL}/pg;
+    }
+  }
+}
