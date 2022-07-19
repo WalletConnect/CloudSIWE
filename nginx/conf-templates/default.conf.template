@@ -43,9 +43,12 @@ http {
             proxy_pass      https://${SUPABASE_URL}/rest/v1;
         }
 
-        # TODO check nginx settings for websockets
         location /realtime/v1 {
             proxy_pass      https://${SUPABASE_URL}/realtime/v1;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "Upgrade";
+            proxy_set_header Host $host;
         }
 
         location /storage/v1 {
