@@ -5,3 +5,6 @@ fqdn_subdomain = null
 
 cpu    = 2048
 memory = 4096
+
+supabase_url = "https://awyuaxlpezyhfkpznrox.supabase.co"
+cors_origins = "https://cloud.walletconnect.com"

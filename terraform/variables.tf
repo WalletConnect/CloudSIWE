@@ -23,3 +23,11 @@ variable "cpu" {
 variable "memory" {
   type = number
 }
+
+variable "supabase_url" {
+  type = string
+}
+
+variable "cors_origins" {
+  type = string
+}

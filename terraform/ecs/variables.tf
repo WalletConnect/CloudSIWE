@@ -10,11 +10,19 @@ variable "vpc_name" {
   type = string
 }
 
-variable "repository_url" {
+variable "gotrue_repository_url" {
   type = string
 }
 
-variable "image_tag" {
+variable "gotrue_image_tag" {
+  type = string
+}
+
+variable "proxy_repository_url" {
+  type = string
+}
+
+variable "proxy_image_tag" {
   type = string
 }
 
@@ -107,4 +115,12 @@ variable "public_subnets" {
 
 variable "private_subnets" {
   type = list(string)
+}
+
+variable "supabase_url" {
+  type = string
+}
+
+variable "cors_origins" {
+  type = string
 }

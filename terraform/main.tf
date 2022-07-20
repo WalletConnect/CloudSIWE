@@ -71,8 +71,11 @@ module "ecs" {
   catcha_secret_arn       = module.secrets.catcha_secret_arn
   captcha_session_key_arn = module.secrets.captcha_session_key_arn
 
-  repository_url = data.aws_ecr_repository.gotrue.repository_url
-  image_tag      = "0.1.6"
+  gotrue_repository_url = data.aws_ecr_repository.gotrue.repository_url
+  gotrue_image_tag      = "0.1.6"
+
+  proxy_repository_url = data.aws_ecr_repository.gotrue_proxy.repository_url
+  proxy_image_tag      = "0.1.0"
 
   cpu    = var.cpu
   memory = var.memory
@@ -81,10 +84,17 @@ module "ecs" {
   vpc_cidr        = module.vpc.vpc_cidr_block
   public_subnets  = module.vpc.public_subnets
   private_subnets = module.vpc.private_subnets
+
+  supabase_url = var.supabase_url
+  cors_origins = var.cors_origins
 }
 
 data "aws_ecr_repository" "gotrue" {
   name = "gotrue"
+}
+
+data "aws_ecr_repository" "gotrue_proxy" {
+  name = "gotrue_proxy"
 }
 
 module "env_bucket" {

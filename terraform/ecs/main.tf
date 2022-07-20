@@ -35,9 +35,9 @@ resource "aws_ecs_task_definition" "app_task_definition" {
   container_definitions = jsonencode([
     {
       name      = "${var.app_name}-gotrue",
-      image     = "${var.repository_url}:${var.image_tag}", # TODO switch to custom image!
-      cpu       = var.cpu - 128,
-      memory    = var.cpu - 256,
+      image     = "${var.gotrue_repository_url}:${var.gotrue_image_tag}", # TODO switch to custom image!
+      cpu       = var.cpu - 128 - 128,                                    # Remove sidecar memory/cpu so rest is assigned to GoTrue
+      memory    = var.cpu - 256 - 128,
       command   = ["gotrue", "serve"],
       essential = true,
       portMappings = [
@@ -96,6 +96,52 @@ resource "aws_ecs_task_definition" "app_task_definition" {
           awslogs-stream-prefix = "ecs"
         }
       }
+    },
+    # DOMAIN=login.walletconnect.com
+
+    # SUPABASE_URL=https://abc.supabase.co
+
+    # GOTRUE_CONTAINER_IP=127.0.0.1
+    # GOTRUE_CONTAINER_PORT=8080
+
+    # CORS_ORIGINS=*
+    # CORS_METHODS=GET, POST, OPTIONS
+    # CORS_HEADERS=*
+    {
+      name   = "nginx-proxy",
+      image  = "${var.proxy_repository_url}:${var.proxy_image_tag}",
+      cpu    = 128,
+      memory = 128,
+      environment = [
+        {
+          name  = "DOMAIN",
+          value = "https://${var.subdomain != null ? "${var.subdomain}." : ""}${var.fqdn}"
+        },
+        {
+          name  = "SUPABASE_URL",
+          value = var.supabase_url
+        },
+        {
+          name  = "GOTRUE_CONTAINER_IP",
+          value = "127.0.0.1"
+        },
+        {
+          name  = "GOTRUE_CONTAINER_PORT",
+          value = "8080"
+        },
+        {
+          name  = "CORS_ORIGINS",
+          value = var.cors_origins
+        },
+        {
+          name  = "CORS_METHODS",
+          value = "GET, POST, PATCH, OPTIONS"
+        },
+        {
+          name  = "CORS_HEADERS",
+          value = "*"
+        }
+      ]
     },
     {
       name      = "aws-otel-collector",
