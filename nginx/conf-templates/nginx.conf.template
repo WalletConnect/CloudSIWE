@@ -9,10 +9,6 @@ http {
     '"$request" $body_bytes_sent "$http_referer" '
     '"$http_user_agent" "$http_x_forwarded_for"';
 
-    upstream supabase {
-        server ${SUPABASE_URL}:443;
-    }
-
     server {
         listen      80 default_server;
         server_name _;
@@ -21,7 +17,7 @@ http {
         access_log /var/log/nginx/access.log;
 
         # TODO evaluate security and look at example kong file in supabase repo
-        location /auth/v1 {
+        location ^~/auth/v1/ {
             if ($request_method = 'OPTIONS') {
                 add_header 'Access-Control-Allow-Origin' '${CORS_ORIGINS}';
                 add_header 'Access-Control-Allow-Methods' '${CORS_METHODS}';
@@ -42,34 +38,32 @@ http {
             add_header 'Access-Control-Allow-Methods' '${CORS_METHODS}' always;
             add_header 'Access-Control-Allow-Headers' '${CORS_HEADERS}' always;
             add_header 'Access-Control-Expose-Headers' '*' always;
-            proxy_pass http://${GOTRUE_CONTAINER_IP}:${GOTRUE_CONTAINER_PORT}$request_uri;
-        }
 
-        location /rest/v1 {
-            proxy_pass      https://supabase/rest/v1$request_uri;
-        }
-
-        location /realtime/v1 {
-            proxy_pass      https://supabase/realtime/v1$request_uri;
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection "Upgrade";
             proxy_set_header Host $host;
+            proxy_set_header  X-Real-IP        $remote_addr;
+            proxy_set_header  X-Forwarded-For  $proxy_add_x_forwarded_for;
+
+            proxy_pass http://${GOTRUE_CONTAINER_IP}:${GOTRUE_CONTAINER_PORT}/;
         }
 
-        location /storage/v1 {
-            proxy_pass      https://supabase/storage/v1$request_uri;
+        # TODO look into because not using right now.
+        location /realtime/v1 {
+            return 400;
         }
 
-        location /pg {
-            proxy_pass      https://supabase/pg$request_uri;
+        location ^~/ {
+            proxy_set_header Host $host;
+            proxy_set_header  X-Real-IP        $remote_addr;
+            proxy_set_header  X-Forwarded-For  $proxy_add_x_forwarded_for;
+
+            proxy_pass      https://${SUPABASE_URL}/;
         }
 
         error_page 404 @404_response;
 
         location @404_response {
             default_type application/json;
-            return 404 '{ "message": "Not Found" }';
+            return 404 '{ "message": "Not Found", "uri": "$request_uri" }';
         }
     }
 }
