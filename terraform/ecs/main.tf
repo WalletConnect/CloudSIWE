@@ -173,7 +173,7 @@ resource "aws_ecs_service" "app_service" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.target_group.arn # Referencing our target group
-    container_name   = aws_ecs_task_definition.app_task_definition.family
+    container_name   = "nginx-proxy"
     container_port   = 8080 # Specifying the container port
   }
 }
