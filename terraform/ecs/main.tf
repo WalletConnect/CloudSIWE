@@ -40,12 +40,6 @@ resource "aws_ecs_task_definition" "app_task_definition" {
       memory    = var.cpu - 256 - 128,
       command   = ["gotrue", "serve"],
       essential = true,
-      portMappings = [
-        {
-          containerPort = 8080,
-          hostPort      = 8080
-        }
-      ],
       secrets = [
         {
           name      = "DATABASE_URL",
@@ -97,21 +91,17 @@ resource "aws_ecs_task_definition" "app_task_definition" {
         }
       }
     },
-    # DOMAIN=login.walletconnect.com
-
-    # SUPABASE_URL=https://abc.supabase.co
-
-    # GOTRUE_CONTAINER_IP=127.0.0.1
-    # GOTRUE_CONTAINER_PORT=8080
-
-    # CORS_ORIGINS=*
-    # CORS_METHODS=GET, POST, OPTIONS
-    # CORS_HEADERS=*
     {
       name   = "nginx-proxy",
       image  = "${var.proxy_repository_url}:${var.proxy_image_tag}",
       cpu    = 128,
       memory = 128,
+      portMappings = [
+        {
+          containerPort = 80,
+          hostPort      = 8080
+        }
+      ],
       environment = [
         {
           name  = "DOMAIN",
