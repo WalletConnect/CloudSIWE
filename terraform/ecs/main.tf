@@ -96,6 +96,7 @@ resource "aws_ecs_task_definition" "app_task_definition" {
       image  = "${var.proxy_repository_url}:${var.proxy_image_tag}",
       cpu    = 128,
       memory = 128,
+      essential = true,
       portMappings = [
         {
           containerPort = 80,
@@ -113,7 +114,7 @@ resource "aws_ecs_task_definition" "app_task_definition" {
         },
         {
           name  = "GOTRUE_CONTAINER_IP",
-          value = "127.0.0.1"
+          value = "localhost"
         },
         {
           name  = "GOTRUE_CONTAINER_PORT",
@@ -196,7 +197,7 @@ resource "aws_lb_target_group" "target_group" {
   slow_start  = 30         # Give a 30 seccond delay to allow the service to startup
   health_check {
     protocol            = "HTTP"
-    path                = "/health"
+    path                = "/auth/v1/health" # GoTrue's health path
     interval            = var.health.interval
     timeout             = var.health.timeout
     healthy_threshold   = var.health.healthy_threshold
@@ -315,10 +316,17 @@ resource "aws_security_group" "vpc_app_ingress" {
   vpc_id      = var.vpc_id
 
   ingress {
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [aws_security_group.lb_ingress.id]
+  }
+
+  ingress {
     from_port       = 8080
     to_port         = 8080
     protocol        = "tcp"
-    security_groups = [aws_security_group.lb_ingress.id]
+    cidr_blocks = [var.vpc_cidr]
   }
 
   egress {
