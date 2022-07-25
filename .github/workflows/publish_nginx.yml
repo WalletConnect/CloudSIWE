@@ -1,4 +1,4 @@
-name: Publish GoTrue Nginx Proxy
+name: Publish Nginx Proxy
 on:
   push:
     branches:
@@ -51,6 +51,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.PRIVATE_REPOSITORY }}:${{ steps.vars.outputs.sha_short }}
+          tags: ${{ env.REPOSITORY }}:${{ steps.vars.outputs.sha_short }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
