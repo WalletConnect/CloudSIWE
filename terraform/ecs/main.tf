@@ -92,10 +92,10 @@ resource "aws_ecs_task_definition" "app_task_definition" {
       }
     },
     {
-      name   = "nginx-proxy",
-      image  = "${var.proxy_repository_url}:${var.proxy_image_tag}",
-      cpu    = 128,
-      memory = 128,
+      name      = "nginx-proxy",
+      image     = "${var.proxy_repository_url}:${var.proxy_image_tag}",
+      cpu       = 128,
+      memory    = 128,
       essential = true,
       portMappings = [
         {
@@ -168,7 +168,7 @@ resource "aws_ecs_service" "app_service" {
 
   network_configuration {
     subnets          = var.private_subnets
-    assign_public_ip = true                                    # We do public ingress through the LB
+    assign_public_ip = true                                # We do public ingress through the LB
     security_groups  = [aws_security_group.app_ingress.id] # Setting the security group
   }
 
@@ -323,9 +323,9 @@ resource "aws_security_group" "app_ingress" {
   }
 
   ingress {
-    from_port       = 8080
-    to_port         = 8080
-    protocol        = "tcp"
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
     cidr_blocks = [var.vpc_cidr]
   }
 
