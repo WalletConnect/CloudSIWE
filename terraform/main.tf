@@ -75,7 +75,7 @@ module "ecs" {
   gotrue_image_tag      = "0.1.6"
 
   proxy_repository_url = data.aws_ecr_repository.gotrue_proxy.repository_url
-  proxy_image_tag      = "0.1.24"
+  proxy_image_tag      = "0.1.31"
 
   cpu    = var.cpu
   memory = var.memory
