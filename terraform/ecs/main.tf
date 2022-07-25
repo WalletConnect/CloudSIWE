@@ -169,7 +169,7 @@ resource "aws_ecs_service" "app_service" {
   network_configuration {
     subnets          = var.private_subnets
     assign_public_ip = true                                    # We do public ingress through the LB
-    security_groups  = [aws_security_group.vpc_app_ingress.id] # Setting the security group
+    security_groups  = [aws_security_group.app_ingress.id] # Setting the security group
   }
 
   load_balancer {
@@ -310,9 +310,9 @@ resource "aws_iam_role_policy_attachment" "ecsTaskExecutionRole_policy" {
 }
 
 # Security Groups
-resource "aws_security_group" "vpc_app_ingress" {
-  name        = "${var.app_name}-vpc-ingress-to-app"
-  description = "Allow app port ingress from vpc"
+resource "aws_security_group" "app_ingress" {
+  name        = "${var.app_name}-ingress-to-app"
+  description = "Allow app port ingress"
   vpc_id      = var.vpc_id
 
   ingress {
