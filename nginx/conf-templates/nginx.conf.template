@@ -1,0 +1,69 @@
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       mime.types;
+
+    log_format   main '$remote_addr - $remote_user [$time_local]  $status '
+    '"$request" $body_bytes_sent "$http_referer" '
+    '"$http_user_agent" "$http_x_forwarded_for"';
+
+    server {
+        listen      80 default_server;
+        server_name _;
+
+        error_log /var/log/nginx/error.log;
+        access_log /var/log/nginx/access.log;
+
+        # TODO evaluate security and look at example kong file in supabase repo
+        location ^~/auth/v1/ {
+            if ($request_method = 'OPTIONS') {
+                add_header 'Access-Control-Allow-Origin' '${CORS_ORIGINS}';
+                add_header 'Access-Control-Allow-Methods' '${CORS_METHODS}';
+                #
+                # Custom headers and headers various browsers *should* be OK with but aren't
+                #
+                add_header 'Access-Control-Allow-Headers' '${CORS_HEADERS}';
+                #
+                # Tell client that this pre-flight info is valid for 20 days
+                #
+                add_header 'Access-Control-Max-Age' 86400;
+                add_header 'Content-Type' 'text/plain; charset=utf-8';
+                add_header 'Content-Length' 0;
+                return 204;
+            }
+
+            proxy_set_header Host $host;
+            proxy_set_header  X-Real-IP        $remote_addr;
+            proxy_set_header  X-Forwarded-For  $proxy_add_x_forwarded_for;
+
+            proxy_pass http://${GOTRUE_CONTAINER_IP}:${GOTRUE_CONTAINER_PORT}/;
+        }
+
+        # TODO look into because not using right now.
+        location /realtime/v1 {
+            return 400;
+        }
+
+        location ^~/ {
+            proxy_set_header  Host ${SUPABASE_URL};
+            proxy_set_header  X-Real-IP        $remote_addr;
+            proxy_set_header  X-Forwarded-For  $proxy_add_x_forwarded_for;
+
+            proxy_ssl_verify off;
+            proxy_ssl_session_reuse off;
+
+            # NOTE: Proxy as HTTP because Cloudflare forces HTTPS and NGINX cannot verify SSL cert
+            #       No sensitive data is shared because all auth happens on self-hosted infra
+            proxy_pass      http://${SUPABASE_URL}/;
+        }
+
+        error_page 404 @404_response;
+
+        location @404_response {
+            default_type application/json;
+            return 404 '{ "message": "Not Found", "uri": "$request_uri" }';
+        }
+    }
+}

@@ -5,3 +5,6 @@ fqdn_subdomain = "staging"
 
 cpu    = 512
 memory = 1024
+
+supabase_url = "cgzcfirzihqiqjiauasg.supabase.co" #! Dev URL
+cors_origins = "*"                                # TODO tighten

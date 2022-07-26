@@ -35,17 +35,11 @@ resource "aws_ecs_task_definition" "app_task_definition" {
   container_definitions = jsonencode([
     {
       name      = "${var.app_name}-gotrue",
-      image     = "${var.repository_url}:${var.image_tag}", # TODO switch to custom image!
-      cpu       = var.cpu - 128,
-      memory    = var.cpu - 256,
+      image     = "${var.gotrue_repository_url}:${var.gotrue_image_tag}", # TODO switch to custom image!
+      cpu       = var.cpu - 128 - 128,                                    # Remove sidecar memory/cpu so rest is assigned to GoTrue
+      memory    = var.cpu - 256 - 128,
       command   = ["gotrue", "serve"],
       essential = true,
-      portMappings = [
-        {
-          containerPort = 8080,
-          hostPort      = 8080
-        }
-      ],
       secrets = [
         {
           name      = "DATABASE_URL",
@@ -98,6 +92,49 @@ resource "aws_ecs_task_definition" "app_task_definition" {
       }
     },
     {
+      name      = "nginx-proxy",
+      image     = "${var.proxy_repository_url}:${var.proxy_image_tag}",
+      cpu       = 128,
+      memory    = 128,
+      essential = true,
+      portMappings = [
+        {
+          containerPort = 80,
+          hostPort      = 80
+        }
+      ],
+      environment = [
+        {
+          name  = "DOMAIN",
+          value = "https://${var.subdomain != null ? "${var.subdomain}." : ""}${var.fqdn}"
+        },
+        {
+          name  = "SUPABASE_URL",
+          value = var.supabase_url
+        },
+        {
+          name  = "GOTRUE_CONTAINER_IP",
+          value = "localhost"
+        },
+        {
+          name  = "GOTRUE_CONTAINER_PORT",
+          value = "8080"
+        },
+        {
+          name  = "CORS_ORIGINS",
+          value = var.cors_origins
+        },
+        {
+          name  = "CORS_METHODS",
+          value = "GET, POST, PATCH, OPTIONS"
+        },
+        {
+          name  = "CORS_HEADERS",
+          value = "*"
+        }
+      ]
+    },
+    {
       name      = "aws-otel-collector",
       image     = "public.ecr.aws/aws-observability/aws-otel-collector:latest",
       command   = ["--config=/etc/ecs/container-insights/otel-task-metrics-config.yaml"],
@@ -131,14 +168,14 @@ resource "aws_ecs_service" "app_service" {
 
   network_configuration {
     subnets          = var.private_subnets
-    assign_public_ip = true                                    # We do public ingress through the LB
-    security_groups  = [aws_security_group.vpc_app_ingress.id] # Setting the security group
+    assign_public_ip = true                                # We do public ingress through the LB
+    security_groups  = [aws_security_group.app_ingress.id] # Setting the security group
   }
 
   load_balancer {
     target_group_arn = aws_lb_target_group.target_group.arn # Referencing our target group
-    container_name   = aws_ecs_task_definition.app_task_definition.family
-    container_port   = 8080 # Specifying the container port
+    container_name   = "nginx-proxy"
+    container_port   = 80 # Specifying the container port
   }
 }
 
@@ -160,7 +197,7 @@ resource "aws_lb_target_group" "target_group" {
   slow_start  = 30         # Give a 30 seccond delay to allow the service to startup
   health_check {
     protocol            = "HTTP"
-    path                = "/health"
+    path                = "/auth/v1/health" # GoTrue's health path
     interval            = var.health.interval
     timeout             = var.health.timeout
     healthy_threshold   = var.health.healthy_threshold
@@ -273,16 +310,23 @@ resource "aws_iam_role_policy_attachment" "ecsTaskExecutionRole_policy" {
 }
 
 # Security Groups
-resource "aws_security_group" "vpc_app_ingress" {
-  name        = "${var.app_name}-vpc-ingress-to-app"
-  description = "Allow app port ingress from vpc"
+resource "aws_security_group" "app_ingress" {
+  name        = "${var.app_name}-ingress-to-app"
+  description = "Allow app port ingress"
   vpc_id      = var.vpc_id
 
   ingress {
-    from_port       = 8080
-    to_port         = 8080
+    from_port       = 80
+    to_port         = 80
     protocol        = "tcp"
     security_groups = [aws_security_group.lb_ingress.id]
+  }
+
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr]
   }
 
   egress {
