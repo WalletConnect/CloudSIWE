@@ -31,7 +31,7 @@ resource "aws_ecs_task_definition" "app_task_definition" {
     "FARGATE"
   ]
   network_mode       = "awsvpc" # Required because of fargate
-  execution_role_arn = aws_iam_role.ecsTaskExecutionRole.arn
+  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
   container_definitions = jsonencode([
     {
       name      = "${var.app_name}-gotrue",
@@ -247,8 +247,8 @@ resource "aws_route53_record" "dns_load_balancer" {
 }
 
 # IAM
-resource "aws_iam_role" "ecsTaskExecutionRole" {
-  name               = "${var.app_name}-ecsTaskExecutionRole"
+resource "aws_iam_role" "ecs_task_execution_role" {
+  name               = "${var.app_name}-ecs-task-execution-role"
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
 
   inline_policy {
