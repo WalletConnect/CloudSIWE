@@ -72,7 +72,7 @@ module "ecs" {
   captcha_session_key_arn = module.secrets.captcha_session_key_arn
 
   gotrue_repository_url = data.aws_ecr_repository.gotrue.repository_url
-  gotrue_image_tag      = "0.1.6"
+  gotrue_image_tag      = "2.10.3-web3"
 
   proxy_repository_url = data.aws_ecr_repository.gotrue_proxy.repository_url
   proxy_image_tag      = "0.1.31"

@@ -36,8 +36,8 @@ resource "aws_ecs_task_definition" "app_task_definition" {
     {
       name      = "${var.app_name}-gotrue",
       image     = "${var.gotrue_repository_url}:${var.gotrue_image_tag}", # TODO switch to custom image!
-      cpu       = var.cpu - 128 - 128,                                    # Remove sidecar memory/cpu so rest is assigned to GoTrue
-      memory    = var.cpu - 256 - 128,
+      cpu       = var.cpu - 128, # Remove sidecar memory/cpu so rest is assigned to GoTrue
+      memory    = var.cpu - 128,
       command   = ["gotrue", "serve"],
       essential = true,
       secrets = [
@@ -133,22 +133,6 @@ resource "aws_ecs_task_definition" "app_task_definition" {
           value = "*"
         }
       ]
-    },
-    {
-      name      = "aws-otel-collector",
-      image     = "public.ecr.aws/aws-observability/aws-otel-collector:latest",
-      command   = ["--config=/etc/ecs/container-insights/otel-task-metrics-config.yaml"],
-      cpu       = 128,
-      memory    = 256,
-      essential = true,
-      logConfiguration = {
-        logDriver = "awslogs",
-        options = {
-          awslogs-group         = "${aws_cloudwatch_log_group.cluster_logs.name}",
-          awslogs-region        = "${var.region}",
-          awslogs-stream-prefix = "ecs"
-        }
-      }
     }
   ])
 }
@@ -304,9 +288,19 @@ data "aws_iam_policy_document" "assume_role_policy" {
   }
 }
 
-resource "aws_iam_role_policy_attachment" "ecsTaskExecutionRole_policy" {
-  role       = aws_iam_role.ecsTaskExecutionRole.name
+resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
+  role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_cloudwatch_policy" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_xray_policy" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
 }
 
 # Security Groups
