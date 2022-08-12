@@ -87,9 +87,6 @@ module "ecs" {
 
   supabase_url = var.supabase_url
   cors_origins = var.cors_origins
-
-  confirm_signup_email = file("../email-templates/confirm-signup.html")
-  reset_password_email = file("../email-templates/reset-password.html")
 }
 
 data "aws_ecr_repository" "gotrue" {

@@ -86,16 +86,24 @@ resource "aws_ecs_task_definition" "app_task_definition" {
           value = "Reset Your WalletConnect Password"
         },
         {
+          name = "GOTRUE_MAILER_URLPATHS_RECOVERY",
+          value = "/auth/v1/verify"
+        },
+        {
           name  = "GOTRUE_MAILER_TEMPLATES_RECOVERY",
-          value = var.reset_password_email
+          value = "https://raw.githubusercontent.com/WalletConnect/CloudSIWE/main/email-templates/reset-password.html"
         },
         {
           name  = "GOTRUE_MAILER_SUBJECTS_CONFIRMATION",
           value = "Confirm Your WalletConnect Signup"
         },
         {
+          name = "GOTRUE_MAILER_URLPATHS_CONFIRMATION",
+          value = "/auth/v1/verify"
+        },
+        {
           name  = "GOTRUE_MAILER_TEMPLATES_CONFIRMATION",
-          value = var.confirm_signup_email
+          value = "https://raw.githubusercontent.com/WalletConnect/CloudSIWE/main/email-templates/confirm-signup.html"
         }
       ],
       logConfiguration = {
