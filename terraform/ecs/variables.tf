@@ -124,3 +124,11 @@ variable "supabase_url" {
 variable "cors_origins" {
   type = string
 }
+
+variable "confirm_signup_email" {
+  type = string
+}
+
+variable "reset_password_email" {
+  type = string
+}
