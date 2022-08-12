@@ -79,7 +79,7 @@ resource "aws_ecs_task_definition" "app_task_definition" {
         },
         {
           name  = "API_EXTERNAL_URL",
-          value = "https://${var.subdomain != null ? "${var.subdomain}." : ""}${var.fqdn}"
+          value = "https://${var.subdomain != null ? "${var.subdomain}." : ""}${var.fqdn}/auth/v1"
         },
         {
           name  = "GOTRUE_MAILER_SUBJECTS_RECOVERY",
