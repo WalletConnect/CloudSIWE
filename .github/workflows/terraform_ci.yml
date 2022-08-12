@@ -1,17 +1,26 @@
-name: Terraform Plan
-
+name: terraform_ci
 on:
   pull_request:
-    branches:
-      - main
     paths:
       - 'terraform/**'
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+  # Support push/pr as event types with different behaviors each:
+  # 1. push: queue up builds
+  # 2. pr: only allow one run per PR
+  group: ${{ github.workflow }}-${{ github.event.type }}${{ github.event.pull_request.number }}
+  # If there is already a workflow running for the same pull request, cancel it
+  cancel-in-progress: ${{ github.event.type == 'PullRequest' }}
 
 jobs:
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - id: fmt
+        uses: WalletConnect/actions/actions/fmt-check-terraform/@master
+
   plan:
     runs-on: ubuntu-latest
     steps:
