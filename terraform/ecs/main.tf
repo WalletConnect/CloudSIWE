@@ -86,7 +86,7 @@ resource "aws_ecs_task_definition" "app_task_definition" {
           value = "Reset Your WalletConnect Password"
         },
         {
-          name = "GOTRUE_MAILER_URLPATHS_RECOVERY",
+          name  = "GOTRUE_MAILER_URLPATHS_RECOVERY",
           value = "/auth/v1/verify"
         },
         {
@@ -98,7 +98,7 @@ resource "aws_ecs_task_definition" "app_task_definition" {
           value = "Confirm Your WalletConnect Signup"
         },
         {
-          name = "GOTRUE_MAILER_URLPATHS_CONFIRMATION",
+          name  = "GOTRUE_MAILER_URLPATHS_CONFIRMATION",
           value = "/auth/v1/verify"
         },
         {
