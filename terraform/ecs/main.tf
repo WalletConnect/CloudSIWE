@@ -150,7 +150,7 @@ resource "aws_ecs_task_definition" "app_task_definition" {
         },
         {
           name  = "CORS_METHODS",
-          value = "GET, POST, PATCH, OPTIONS"
+          value = "GET, POST, PATCH, PUT, OPTIONS"
         },
         {
           name  = "CORS_HEADERS",
