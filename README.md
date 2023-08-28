@@ -1,5 +1,8 @@
 # CloudSIWE
 
+> [!IMPORTANT]
+> This infrastructure is no longer used by WalletConnect
+
 WalletConnect Self-Hosted GoTrue infrastructure and supporting files
 
 ## Terraform Infrastructure
